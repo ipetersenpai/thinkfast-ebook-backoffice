@@ -196,7 +196,7 @@ export default function DashboardPage() {
                   <span className="text-blue-500 ml-2">vs last month</span>
                 </div>
               </div>
-              <div className="p-3 rounded-lg bg-white/30 backdrop-blur-sm text-blue-600">
+              <div className="p-3 rounded-lg bg-blue-50 backdrop-blur-sm text-blue-600">
                 <FiUsers size={28} />
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function DashboardPage() {
                   <span className="text-green-500 ml-2">vs last month</span>
                 </div>
               </div>
-              <div className="p-3 rounded-lg bg-white/30 backdrop-blur-sm text-green-600">
+              <div className="p-3 rounded-lg bg-green-50 backdrop-blur-sm text-green-600">
                 <FiBookOpen size={28} />
               </div>
             </div>
@@ -252,7 +252,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
               </div>
-              <div className="p-3 rounded-lg bg-white/30 backdrop-blur-sm text-yellow-600">
+              <div className="p-3 rounded-lg bg-yellow-50 backdrop-blur-sm text-yellow-600">
                 <FiClipboard size={28} />
               </div>
             </div>
@@ -289,7 +289,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <div className="p-3 rounded-lg bg-white/30 backdrop-blur-sm text-purple-600">
+              <div className="p-3 rounded-lg backdrop-blur-sm bg-purple-50 text-purple-600">
                 <FiCheckCircle size={28} />
               </div>
             </div>

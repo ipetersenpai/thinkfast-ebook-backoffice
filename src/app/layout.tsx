@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Thinfast Tablet Management System",
+  title: "Thinkfast Tablet Management System",
   description: `It is a revolutionary, innovative and cost-effective solution approach to modern education,
 replacing traditional physical books with interactive and intuitive eBooks. This system enhances
 learning efficiency by integrating digital resources, student management tools, and interactive
