@@ -1,6 +1,10 @@
 "use client";
 import {
   FiUsers,
+  FiBookOpen,
+  FiClipboard,
+  FiCheckCircle,
+  FiTrendingUp,
   FiChevronRight,
   FiCalendar,
   FiChevronLeft,
@@ -166,20 +170,30 @@ export default function DashboardPage() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left Side - Dashboard Cards */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Total Male Students Card */}
+          {/* Total Students Enrolled Card */}
           <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 h-full">
             <div className="flex justify-between items-start h-full">
               <div className="flex flex-col justify-between h-full">
                 <div>
                   <span className="text-blue-600 text-sm font-medium">
-                    Total Male Students
+                    Total Users
                   </span>
-                  <p className="text-4xl font-bold mt-2 text-gray-800">30</p>
+                  <p className="text-4xl font-bold mt-2 text-gray-800">
+                    {data.totalStudents.toLocaleString()}
+                  </p>
                 </div>
                 <div className="mt-6 flex items-center text-sm">
-                  <span className="flex items-center text-gray-600">
-                    Total enrolled students this Academic Year
+                  <span
+                    className={`flex items-center ${
+                      data.studentsChange >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    <FiTrendingUp className="mr-1" />
+                    {Math.abs(data.studentsChange)}%
                   </span>
+                  <span className="text-blue-500 ml-2">vs last month</span>
                 </div>
               </div>
               <div className="p-3 rounded-lg bg-blue-50 backdrop-blur-sm text-blue-600">
@@ -188,36 +202,174 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Total Female Students Card */}
           <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 h-full">
             <div className="flex justify-between items-start h-full">
               <div className="flex flex-col justify-between h-full">
                 <div>
-                  <span className="text-pink-600 text-sm font-medium">
-                    Total Female Students
+                  <span className="text-green-600 text-sm font-medium">
+                    Total Students
                   </span>
-                  <p className="text-4xl font-bold mt-2 text-gray-800">25</p>
+                  <p className="text-4xl font-bold mt-2 text-gray-800">
+                    {data.totalStudents.toLocaleString()}
+                  </p>
                 </div>
                 <div className="mt-6 flex items-center text-sm">
-                  <span className="flex items-center text-gray-600">
-                    Total enrolled students this Academic Year
+                  <span
+                    className={`flex items-center ${
+                      data.studentsChange >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    <FiTrendingUp className="mr-1" />
+                    {Math.abs(data.studentsChange)}%
                   </span>
+                  <span className="text-green-500 ml-2">vs last month</span>
                 </div>
               </div>
-              <div className="p-3 rounded-lg bg-pink-50 backdrop-blur-sm text-pink-600">
+              <div className="p-3 rounded-lg bg-blue-50 backdrop-blur-sm text-green-600">
                 <FiUsers size={28} />
               </div>
             </div>
           </div>
 
-          <div className="p-6 h-full hidden lg:block"></div>
-          <div className="p-6 h-full hidden lg:block"></div>
-          <div className="p-6 h-full hidden lg:block"></div>
-          <div className="p-6 h-full hidden lg:block"></div>
-          <div className="p-6 h-full hidden lg:block"></div>
-          <div className="p-6 h-full hidden lg:block"></div>
-          <div className="p-6 h-full hidden lg:block"></div>
-          <div className="p-6 h-full hidden lg:block"></div>
+          {/* Total Ebooks Card */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 h-full">
+            <div className="flex justify-between items-start h-full">
+              <div className="flex flex-col justify-between h-full">
+                <div>
+                  <span className="text-indigo-600 text-sm font-medium">
+                    Total Ebooks
+                  </span>
+                  <p className="text-4xl font-bold mt-2 text-gray-800">
+                    {data.totalCourses.toLocaleString()}
+                  </p>
+                </div>
+                <div className="mt-6 flex items-center text-sm">
+                  <span
+                    className={`flex items-center ${
+                      data.coursesChange >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    <FiTrendingUp className="mr-1" />
+                    {Math.abs(data.coursesChange)}%
+                  </span>
+                  <span className="text-indigo-500 ml-2">vs last month</span>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg bg-indigo-50 backdrop-blur-sm text-indigo-600">
+                <FiBookOpen size={28} />
+              </div>
+            </div>
+          </div>
+
+          {/* Students Not Evaluated Card */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 h-full">
+            <div className="flex justify-between items-start h-full">
+              <div className="flex flex-col justify-between h-full">
+                <div>
+                  <span className="text-yellow-600 text-sm font-medium">
+                    Pending Evaluations
+                  </span>
+                  <p className="text-4xl font-bold mt-2 text-gray-800">
+                    {data.studentsNotEvaluated.toLocaleString()}
+                  </p>
+                </div>
+                <div className="mt-6">
+                  <span className="inline-block bg-yellow-200/80 text-yellow-800 text-xs px-3 py-1 rounded-full font-medium">
+                    Action required
+                  </span>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg bg-yellow-50 backdrop-blur-sm text-yellow-600">
+                <FiClipboard size={28} />
+              </div>
+            </div>
+          </div>
+
+          {/* Done Evaluation Card */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 h-full">
+            <div className="flex justify-between items-start h-full">
+              <div className="flex flex-col justify-between h-full">
+                <div>
+                  <span className="text-purple-600 text-sm font-medium">
+                    Completed Evaluations
+                  </span>
+                  <p className="text-4xl font-bold mt-2 text-gray-800">
+                    {data.evaluationsDone.toLocaleString()}
+                  </p>
+                </div>
+                <div className="mt-6">
+                  <div className="w-full bg-white/50 rounded-full h-2.5">
+                    <div
+                      className="bg-purple-600 h-2.5 rounded-full"
+                      style={{
+                        width: `${
+                          (data.evaluationsDone / data.totalStudents) * 100
+                        }%`,
+                      }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-purple-600 mt-2">
+                    {Math.round(
+                      (data.evaluationsDone / data.totalStudents) * 100
+                    )}
+                    % completion rate
+                  </p>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg backdrop-blur-sm bg-purple-50 text-purple-600">
+                <FiCheckCircle size={28} />
+              </div>
+            </div>
+          </div>
+
+          {/* Approved Evaluations Card */}
+          <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 h-full">
+            <div className="flex justify-between items-start h-full">
+              <div className="flex flex-col justify-between h-full">
+                <div>
+                  <span className="text-red-600 text-sm font-medium">
+                    Approved Evaluations
+                  </span>
+                  <p className="text-4xl font-bold mt-2 text-gray-800">
+                    {data.evaluationsDone.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    This Academic Session
+                  </p>
+                </div>
+                <div className="mt-6">
+                  <div className="w-full bg-gray-100 rounded-full h-2.5">
+                    <div
+                      className="bg-red-500 h-2.5 rounded-full"
+                      style={{
+                        width: `${
+                          (data.evaluationsDone / data.totalStudents) * 100
+                        }%`,
+                      }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-red-600 font-medium">
+                      {Math.round(
+                        (data.evaluationsDone / data.totalStudents) * 100
+                      )}
+                      % approved
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {data.totalStudents - data.evaluationsDone} remaining
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg bg-red-50 text-red-600">
+                <FiCheckCircle size={28} />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Right Side - Academic Calendar */}
@@ -227,7 +379,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h3 className="font-semibold text-gray-800 flex items-center">
                 <FiCalendar className="mr-2 text-blue-600" />
-                Academic Calendar
+                Academic Year 2024-2025
               </h3>
             </div>
             {renderCalendar()}

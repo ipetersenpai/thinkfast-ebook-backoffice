@@ -10,7 +10,10 @@ export function Navbar({ onSidebarToggle }: { onSidebarToggle: () => void }) {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -26,23 +29,26 @@ export function Navbar({ onSidebarToggle }: { onSidebarToggle: () => void }) {
         <button onClick={onSidebarToggle} className="text-2xl md:hidden">
           <FiMenu />
         </button>
-        <Image
-          src="/assets/ebook_logo.webp"
-          alt="Ebook Logo"
-          width={120}
-          height={100}
-          className="mr-2"
-        />
+        <div className="relative w-[150px] h-[50px]">
+          <Image
+            src="/assets/ebook_logo.webp"
+            alt="Ebook Logo"
+            fill
+            className="object-contain"
+          />
+        </div>
       </div>
       <div className="relative">
         <div className="flex flex-row items-center">
-        <span className="hidden md:block text-black mr-2">Juan dela Cruz</span>
-        <button
-          onClick={() => setOpen(!open)}
-          className="flex items-center space-x-2 text-black bg-slate-100 rounded-full p-2 hover:bg-slate-200 hover:cursor-pointer transition duration-300"
-        >
-          <FiUser className="text-xl" />
-        </button>
+          <span className="hidden md:block text-black mr-2">
+            Juan dela Cruz
+          </span>
+          <button
+            onClick={() => setOpen(!open)}
+            className="flex items-center space-x-2 text-black bg-slate-100 rounded-full p-2 hover:bg-slate-200 hover:cursor-pointer transition duration-300"
+          >
+            <FiUser className="text-xl" />
+          </button>
         </div>
 
         {open && (

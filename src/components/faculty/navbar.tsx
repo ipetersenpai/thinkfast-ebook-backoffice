@@ -26,13 +26,14 @@ export function Navbar({ onSidebarToggle }: { onSidebarToggle: () => void }) {
         <button onClick={onSidebarToggle} className="text-2xl md:hidden">
           <FiMenu />
         </button>
-        <Image
-          src="/assets/ebook_logo.webp"
-          alt="Ebook Logo"
-          width={120}
-          height={100}
-          className="mr-2"
-        />
+        <div className="relative w-[150px] h-[50px]">
+          <Image
+            src="/assets/ebook_logo.webp"
+            alt="Ebook Logo"
+            fill
+            className="object-contain"
+          />
+        </div>
       </div>
       <div className="relative">
         <div className="flex flex-row items-center">

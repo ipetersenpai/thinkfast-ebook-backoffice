@@ -7,6 +7,7 @@ import {
   FiMenu,
   FiX,
   FiHome,
+  FiCalendar,
   FiTrendingUp,
   FiBookOpen,
 } from 'react-icons/fi';
@@ -20,10 +21,14 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
   const [activeHref, setActiveHref] = useState('');
 
   const menuItems = [
-    { href: '/faculty', label: 'Dashboard', icon: <FiHome className="flex-shrink-0" /> },
-    { href: '/faculty/course-progress', label: 'Course Progress', icon: <FiTrendingUp className="flex-shrink-0" /> },
-    { href: '/faculty/scores', label: 'Score History', icon: <HiOutlineDocumentReport className="flex-shrink-0" /> },
-    { href: '/faculty/lessons', label: 'Lessons Management', icon: <FiBookOpen className="flex-shrink-0" /> },
+    { href: '/superadmin', label: 'Dashboard', icon: <FiHome className="flex-shrink-0" /> },
+    { href: '/superadmin/users', label: 'Users', icon: <FiTrendingUp className="flex-shrink-0" /> },
+    { href: '/superadmin/enrolled-students', label: 'Enrolled Students', icon: <HiOutlineDocumentReport className="flex-shrink-0" /> },
+    { href: '/superadmin/', label: 'Lessons Management', icon: <FiBookOpen className="flex-shrink-0" /> },
+
+    // A.Y. Management section
+    { section: 'A.Y. Management' },
+    { href: '/administrative/academic-year', label: 'A.Y Configuration', icon: <FiCalendar className="flex-shrink-0" /> },
 
     { section: 'Assessment Tool' },
     { href: '/faculty/create-assessment', label: 'Create Assessment', icon: <MdOutlineAssessment className="flex-shrink-0" /> },

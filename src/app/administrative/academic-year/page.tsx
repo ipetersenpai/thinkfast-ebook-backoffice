@@ -110,11 +110,11 @@ export default function AcademicYearPage() {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-600">
-        <a href="/dashboard" className="text-gray-500 hover:text-blue-800 hover:underline">
+        <a href="/administrative" className="text-gray-500 hover:text-blue-800 hover:underline">
           Dashboard
         </a>
         <FiChevronRight className="mx-2 text-gray-400" size={14} />
-        <a href="/dashboard/academic-year" className="text-blue-600 hover:text-blue-800 hover:underline">
+        <a href="/administrative/academic-year" className="text-blue-600 hover:text-blue-800 hover:underline">
           Academic Year Management
         </a>
       </div>
