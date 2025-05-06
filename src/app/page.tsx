@@ -2,10 +2,64 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { FiEye, FiEyeOff, FiLock, FiUser } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import Cookies from "js-cookie";
+import { login } from "../redux/slice/auth/authSlice";
+import { API_URL } from "@/config";
 
 export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      // 1️⃣ Store JWT in cookie named "xyz_token"
+      Cookies.set("xyz_token", data.token, {
+        expires: 1,        // 1 day
+        sameSite: "lax",   // adjust as needed
+        secure: process.env.NODE_ENV === "development",
+        path: "/",
+      });
+
+      // 2️⃣ Dispatch user info to Redux
+      dispatch(login(JSON.stringify(data.user)));
+
+      // 3️⃣ Redirect based on role
+      const role = data.user.role.toLowerCase();
+      if (role === "registrar" || role === "principal") {
+        router.push("/administrative");
+      } else if (role === "teacher") {
+        router.push("/faculty");
+      } else if (role === "admin" || role === "superadmin") {
+        router.push("/superadmin");
+      } else {
+        setError("Unknown role");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -35,9 +89,15 @@ export default function Home() {
           </div>
 
           <div className="bg-white p-8 shadow rounded-lg border border-gray-100">
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && (
+                <div className="text-red-500 text-sm text-center">{error}</div>
+              )}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Username
                 </label>
                 <div className="relative rounded-md shadow-sm">
@@ -45,10 +105,12 @@ export default function Home() {
                     <FiUser className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
+                    id="username"
+                    name="username"
+                    type="text"
                     required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="Enter your username"
                   />
@@ -57,10 +119,16 @@ export default function Home() {
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Password
                   </label>
-                  <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+                  <a
+                    href="#"
+                    className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                  >
                     Forgot password?
                   </a>
                 </div>
@@ -73,6 +141,8 @@ export default function Home() {
                     name="password"
                     type={showPassword ? "text" : "password"}
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="Enter your password"
                   />
@@ -102,8 +172,11 @@ export default function Home() {
           </div>
 
           <div className="text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+            Don't have an account?{" "}
+            <a
+              href="#"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
               Contact administrator
             </a>
           </div>
@@ -114,7 +187,9 @@ export default function Home() {
       <footer className="bg-white py-4 border-t border-gray-200">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-            <span>© {new Date().getFullYear()} Bridgette. All rights reserved.</span>
+            <span>
+              © {new Date().getFullYear()} Bridgette. All rights reserved.
+            </span>
             <div className="flex space-x-6 mt-2 md:mt-0">
               <a href="#" className="hover:text-gray-700">
                 cerebrox.it@gmail.com
