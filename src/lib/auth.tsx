@@ -1,4 +1,4 @@
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 
 export interface JwtPayload {
@@ -67,4 +67,17 @@ export function getTokenFromCookies(): string | null {
     console.error('Failed to get token from cookies:', error);
     return null;
   }
+}
+
+/**
+ * Extract role and expiration info from the token.
+ * @param token - JWT token string
+ * @returns Object with role and exp, or nulls if invalid
+ */
+export function getTokenInfo(token: string): { role: string | null; exp: number | null } {
+  const payload = decodeToken(token);
+  return {
+    role: payload?.role ?? null,
+    exp: payload?.exp ?? null,
+  };
 }

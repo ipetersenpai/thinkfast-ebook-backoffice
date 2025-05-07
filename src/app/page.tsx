@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FiEye, FiEyeOff, FiLock, FiUser } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock, FiUser, FiLoader } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 import { login } from "../redux/slice/auth/authSlice";
@@ -14,6 +14,7 @@ export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true); // start loading
 
     try {
       const res = await fetch(`${API_URL}/api/auth/login`, {
@@ -34,18 +36,15 @@ export default function Home() {
         throw new Error(data.error || "Login failed");
       }
 
-      // 1️⃣ Store JWT in cookie named "xyz_token"
       Cookies.set("xyz_token", data.token, {
-        expires: 1,        // 1 day
-        sameSite: "lax",   // adjust as needed
+        expires: 1,
+        sameSite: "lax",
         secure: process.env.NODE_ENV === "development",
         path: "/",
       });
 
-      // 2️⃣ Dispatch user info to Redux
       dispatch(login(JSON.stringify(data.user)));
 
-      // 3️⃣ Redirect based on role
       const role = data.user.role.toLowerCase();
       if (role === "registrar" || role === "principal") {
         router.push("/administrative");
@@ -58,6 +57,8 @@ export default function Home() {
       }
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setIsLoading(false); // stop loading
     }
   };
 
@@ -90,9 +91,14 @@ export default function Home() {
 
           <div className="bg-white p-8 shadow rounded-lg border border-gray-100">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && (
-                <div className="text-red-500 text-sm text-center">{error}</div>
-              )}
+                {error && (
+                <div
+                  className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-sm text-center"
+                  role="alert"
+                >
+                  {error}
+                </div>
+                )}
               <div>
                 <label
                   htmlFor="username"
@@ -165,7 +171,14 @@ export default function Home() {
                   type="submit"
                   className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                 >
-                  Sign in
+                  {isLoading ? (
+                    <>
+                      <FiLoader className="animate-spin h-5 w-5 mr-2" />
+                      Signing in…
+                    </>
+                  ) : (
+                    "Sign in"
+                  )}
                 </button>
               </div>
             </form>

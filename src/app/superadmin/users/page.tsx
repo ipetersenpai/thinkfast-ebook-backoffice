@@ -10,6 +10,10 @@ import {
   FiChevronLeft,
   FiChevronRight as FiChevronRightIcon,
 } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { fetchUsers } from "@/redux/slice/user/getUsersSlice";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: number;
@@ -17,10 +21,9 @@ interface User {
   lastname: string;
   middlename?: string;
   username: string;
-  password: string;
   email: string;
   role: string;
-  status: "Active" | "Deactivated";
+  status: string;
   created_at: string;
   updated_at: string;
 }
@@ -31,95 +34,17 @@ interface SortConfig {
 }
 
 export default function UserManagementPage() {
-const mockUsers: User[] = [
-    {
-        id: 1,
-        firstname: "John",
-        lastname: "Doe",
-        middlename: "A.",
-        username: "johndoe",
-        password: "password123",
-        email: "johndoe@example.com",
-        role: "Teacher",
-        status: "Active",
-        created_at: "2023-01-01",
-        updated_at: "2023-06-01",
-    },
-    {
-        id: 2,
-        firstname: "Jane",
-        lastname: "Smith",
-        username: "janesmith",
-        password: "password456",
-        email: "janesmith@example.com",
-        role: "Teacher",
-        status: "Deactivated",
-        created_at: "2023-02-01",
-        updated_at: "2023-07-01",
-    },
-    {
-        id: 3,
-        firstname: "Jane",
-        lastname: "Smith",
-        username: "janesmith",
-        password: "password456",
-        email: "janesmith@example.com",
-        role: "Principal",
-        status: "Deactivated",
-        created_at: "2023-02-01",
-        updated_at: "2023-07-01",
-    },
-    {
-        id: 4,
-        firstname: "Alice",
-        lastname: "Johnson",
-        username: "alicejohnson",
-        password: "password789",
-        email: "alicejohnson@example.com",
-        role: "Superadmin",
-        status: "Active",
-        created_at: "2023-03-01",
-        updated_at: "2023-08-01",
-    },
-    {
-        id: 5,
-        firstname: "Bob",
-        lastname: "Brown",
-        username: "bobbrown",
-        password: "password101",
-        email: "bobbrown@example.com",
-        role: "Registrar",
-        status: "Active",
-        created_at: "2023-04-01",
-        updated_at: "2023-09-01",
-    },
-    {
-        id: 6,
-        firstname: "Charlie",
-        lastname: "Davis",
-        username: "charliedavis",
-        password: "password202",
-        email: "charliedavis@example.com",
-        role: "Superadmin",
-        status: "Deactivated",
-        created_at: "2023-05-01",
-        updated_at: "2023-10-01",
-    },
-    {
-        id: 7,
-        firstname: "Diana",
-        lastname: "Evans",
-        username: "dianaevans",
-        password: "password303",
-        email: "dianaevans@example.com",
-        role: "Registrar",
-        status: "Active",
-        created_at: "2023-06-01",
-        updated_at: "2023-11-01",
-    },
-];
+  const dispatch = useDispatch<AppDispatch>();
+  const { users, loading, error } = useSelector(
+    (state: RootState) => state.getUsers
+  );
 
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
@@ -128,9 +53,19 @@ const mockUsers: User[] = [
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
 
+  // Inside your component:
+  const router = useRouter();
+
   useEffect(() => {
-    const filtered = mockUsers.filter(
-      (user) =>
+    const filtered = users.filter(
+      (user: {
+        firstname: string;
+        lastname: string;
+        username: string;
+        email: string;
+        role: string;
+        status: string;
+      }) =>
         user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -138,9 +73,9 @@ const mockUsers: User[] = [
         user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.status.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setUsers(filtered);
+    setFilteredUsers(filtered);
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, users]);
 
   const requestSort = (key: keyof User) => {
     let direction: "asc" | "desc" = "asc";
@@ -149,7 +84,7 @@ const mockUsers: User[] = [
     }
     setSortConfig({ key, direction });
 
-    const sorted = [...users].sort((a, b) => {
+    const sorted = [...filteredUsers].sort((a, b) => {
       if (a[key]! < b[key]!) {
         return direction === "asc" ? -1 : 1;
       }
@@ -158,14 +93,13 @@ const mockUsers: User[] = [
       }
       return 0;
     });
-
-    setUsers(sorted);
+    setFilteredUsers(sorted);
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -211,13 +145,16 @@ const mockUsers: User[] = [
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+          <a
+            href="/superadmin/users/create"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors hover:cursor-pointer text-center"
+          >
             Add New User
-          </button>
+          </a>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto relative">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -227,7 +164,6 @@ const mockUsers: User[] = [
                   "lastname",
                   "middlename",
                   "username",
-                  "password",
                   "email",
                   "role",
                   "status",
@@ -291,9 +227,7 @@ const mockUsers: User[] = [
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {user.username}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {user.password}
-                    </td>
+
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {user.email}
                     </td>
@@ -303,9 +237,9 @@ const mockUsers: User[] = [
                     <td className="px-6 py-4 text-sm text-center">
                       <span
                         className={`px-2 inline-flex text-xsleading-5 font-semibold rounded-full ${
-                          user.status === "Active"
+                          user.status === "active"
                             ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
+                            : "bg-red-100 text-red-800"
                         }`}
                       >
                         {user.status}
@@ -318,7 +252,12 @@ const mockUsers: User[] = [
                       {formatDate(user.updated_at)}
                     </td>
                     <td className="px-6 py-4 text-right text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 mr-4">
+                      <button
+                        onClick={() =>
+                          router.push(`/superadmin/users/${user.id}/update`)
+                        }
+                        className="text-blue-600 hover:text-blue-900 mr-4"
+                      >
                         <FiEdit2 size={18} />
                       </button>
                       <button className="text-red-600 hover:text-red-900">

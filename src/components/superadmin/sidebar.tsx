@@ -30,9 +30,9 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
     { section: 'A.Y. Management' },
     { href: '/administrative/academic-year', label: 'A.Y Configuration', icon: <FiCalendar className="flex-shrink-0" /> },
 
-    { section: 'Assessment Tool' },
-    { href: '/faculty/create-assessment', label: 'Create Assessment', icon: <MdOutlineAssessment className="flex-shrink-0" /> },
-    { href: '/faculty/student-submission', label: 'Student Submission', icon: <AiOutlineFileSearch className="flex-shrink-0" /> },
+    { section: 'E-book Management' },
+    { href: '/superadmin/ebooks', label: 'E-Books', icon: <MdOutlineAssessment className="flex-shrink-0" /> },
+    { href: '/superadmin/create-ebooks', label: 'Create E-Books', icon: <AiOutlineFileSearch className="flex-shrink-0" /> },
   ];
 
   useEffect(() => {
