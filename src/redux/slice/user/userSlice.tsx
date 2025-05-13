@@ -45,7 +45,7 @@ export const fetchUserDetails = createAsyncThunk<
     const userId = id || getUserIdFromToken(token);
     if (!userId) throw new Error('Invalid user ID');
 
-    const response = await axios.get(`http://127.0.0.1:3500/api/get-user/${userId}`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/get-user/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

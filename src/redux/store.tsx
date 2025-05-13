@@ -5,7 +5,8 @@ import userReducer from './slice/user/userSlice';
 import updateUserReducer from './slice/user/updateUserSlice';
 import getUsersReducer from './slice/user/getUsersSlice';
 import createUsersReducer from './slice/user/createUsersSlice';
-
+import getAcademicYearReducer from './slice/administrative/academicYear/getAcademicYearSlice';
+import createAcademicYearReducer from './slice/administrative/academicYear/createAcademicYearSlice';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -13,6 +14,8 @@ export const store = configureStore({
     getUsers: getUsersReducer,
     createUsers: createUsersReducer,
     updateUser: updateUserReducer,
+    getAcademicYear: getAcademicYearReducer,
+    createAcademicYear: createAcademicYearReducer,
   },
 });
 

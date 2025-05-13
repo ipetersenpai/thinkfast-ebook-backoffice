@@ -2,8 +2,8 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "@/components/superadmin/sidebar";
-import { Navbar } from "@/components/superadmin/navbar";
+import { Sidebar } from "@/components/sidebar";
+import { Navbar } from "@/components/navbar";
 import { ReactNode } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

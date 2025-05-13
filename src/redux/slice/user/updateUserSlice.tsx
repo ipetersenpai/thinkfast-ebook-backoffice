@@ -34,7 +34,7 @@ export const updateUser = createAsyncThunk<
   try {
     const token = getTokenFromCookies();
     const response = await axios.put(
-      `http://127.0.0.1:3500/api/users/update/${userData.id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/update/${userData.id}`,
       userData,
       {
         headers: {

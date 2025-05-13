@@ -35,7 +35,7 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { rejec
             return rejectWithValue('No authentication token found');
         }
 
-        const response = await axios.get('http://127.0.0.1:3500/api/users', {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
