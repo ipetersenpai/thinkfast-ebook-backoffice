@@ -2,8 +2,8 @@
 "use client";
 
 import { useState } from 'react';
-import { Sidebar } from '@/components/faculty/sidebar';
-import { Navbar } from '@/components/faculty/navbar';
+import { Sidebar } from '@/components/sidebar';
+import { Navbar } from '@/components/navbar';
 import { ReactNode } from 'react';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

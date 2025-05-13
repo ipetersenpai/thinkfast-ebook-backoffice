@@ -222,7 +222,7 @@ export default function CreateUserPage() {
               value={form.password}
               onChange={handleChange}
               required
-              className="block w-full md:w-[50%] px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full md:w-[49%] px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               placeholder="Enter a secure password"
             />
           </div>

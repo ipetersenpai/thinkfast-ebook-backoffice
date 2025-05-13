@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
 import { fetchUserDetails } from "@/redux/slice/user/userSlice";
-import { logout } from "../../redux/slice/auth/authSlice";
+import { logout } from "../redux/slice/auth/authSlice";
 
 export function Navbar({ onSidebarToggle }: { onSidebarToggle: () => void }) {
   const [open, setOpen] = useState(false);
