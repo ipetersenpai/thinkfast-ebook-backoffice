@@ -55,10 +55,14 @@ export function Sidebar({
 
       if (role === "superadmin") {
         setMenuItems(superadmin_menuItems);
-      } else if (role === "principal" || role === "registrar") {
-        setMenuItems(admin_menuItems);
+      } else if (role === "principal") {
+        setMenuItems(principal_menuItems);
+      } else if (role === "registrar") {
+        setMenuItems(registrar_menuItems);
       } else if (role === "teacher") {
         setMenuItems(faculty_menuItems);
+      } else if (role === "author") {
+        setMenuItems(author_menuItems);
       } else {
         setMenuItems([]); // Unknown role or no access
       }
@@ -111,8 +115,8 @@ export function Sidebar({
   ];
 
   // administrative menu items
-  // Userrole is "principal" or "registrar"
-  const admin_menuItems = [
+  // Userrole is "registrar"
+  const registrar_menuItems = [
     {
       href: "/administrative",
       label: "Dashboard",
@@ -136,7 +140,84 @@ export function Sidebar({
       icon: <FiBook className="flex-shrink-0" />,
     },
     {
-      href: "/administrative/courses/block-courses",
+      href: "/administrative/block-courses",
+      label: "Blocked Courses",
+      icon: <TbFileStack className="flex-shrink-0" />,
+    },
+    {
+      href: "/administrative/courses/assign-courses",
+      label: "Assign Courses",
+      icon: <IoLibrarySharp className="flex-shrink-0" />,
+    },
+
+    // A.Y. Management section
+    { section: "A.Y. Management" },
+    {
+      href: "/administrative/academic-year",
+      label: "A.Y Configuration",
+      icon: <FiCalendar className="flex-shrink-0" />,
+    },
+  ];
+
+  // author menu items
+  // Userrole is "author"
+  const author_menuItems = [
+    {
+      href: "/faculty",
+      label: "Dashboard",
+      icon: <FiHome className="flex-shrink-0" />,
+    },
+    {
+      href: "/author/lessons",
+      label: "Lessons Management",
+      icon: <FiBookOpen className="flex-shrink-0" />,
+    },
+
+    { section: "Assessment Tool" },
+    {
+      href: "/author/create-assessment",
+      label: "Assessment",
+      icon: <MdOutlineAssessment className="flex-shrink-0" />,
+    },
+    {
+      href: "/author/create-performance-task",
+      label: "Performance Task",
+      icon: <AiOutlineFileSearch className="flex-shrink-0" />,
+    },
+    {
+      href: "/author/create-quarter-exam",
+      label: "Quarter Exam",
+      icon: <AiOutlineFileSearch className="flex-shrink-0" />,
+    },
+  ];
+
+  // administrative menu items
+  // Userrole is "principal"
+  const principal_menuItems = [
+    {
+      href: "/administrative",
+      label: "Dashboard",
+      icon: <FiGrid className="flex-shrink-0" />,
+    },
+    {
+      href: "/administrative/enroll",
+      label: "Enroll Student",
+      icon: <FiUserPlus className="flex-shrink-0" />,
+    },
+    {
+      href: "/administrative/scores",
+      label: "Score Management",
+      icon: <FiClipboard className="flex-shrink-0" />,
+    },
+
+    { section: "Courses Management" },
+    {
+      href: "/administrative/courses",
+      label: "Courses",
+      icon: <FiBook className="flex-shrink-0" />,
+    },
+    {
+      href: "/administrative/block-courses",
       label: "Blocked Courses",
       icon: <TbFileStack className="flex-shrink-0" />,
     },
@@ -200,23 +281,6 @@ export function Sidebar({
       href: "/faculty/scores",
       label: "Score History",
       icon: <HiOutlineDocumentReport className="flex-shrink-0" />,
-    },
-    {
-      href: "/faculty/lessons",
-      label: "Lessons Management",
-      icon: <FiBookOpen className="flex-shrink-0" />,
-    },
-
-    { section: "Assessment Tool" },
-    {
-      href: "/faculty/create-assessment",
-      label: "Create Assessment",
-      icon: <MdOutlineAssessment className="flex-shrink-0" />,
-    },
-    {
-      href: "/faculty/student-submission",
-      label: "Student Submission",
-      icon: <AiOutlineFileSearch className="flex-shrink-0" />,
     },
   ];
 

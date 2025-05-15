@@ -1,23 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import {
-  createUser,
-  resetCreateUserState,
-} from "@/redux/slice/user/createUsersSlice";
+import { useMutation } from "@tanstack/react-query";
+import { createUser, CreateUserInput } from "@/api/user";
 import { toast } from "react-toastify";
 import { FiChevronRight } from "react-icons/fi";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function CreateUserPage() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { loading, success, error } = useSelector(
-    (state: RootState) => state.createUsers
-  );
-
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<CreateUserInput>({
     firstname: "",
     middlename: "",
     lastname: "",
@@ -28,10 +19,14 @@ export default function CreateUserPage() {
     status: "active",
   });
 
-  useEffect(() => {
-    if (success) {
+  const {
+    mutate,
+    isPending,
+    reset,
+  } = useMutation({
+    mutationFn: createUser,
+    onSuccess: () => {
       toast.success("User created successfully!");
-      dispatch(resetCreateUserState());
       setForm({
         firstname: "",
         middlename: "",
@@ -42,12 +37,17 @@ export default function CreateUserPage() {
         role: "",
         status: "active",
       });
-    }
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Failed to create user");
+    },
+  });
 
-    if (error) {
-      toast.error(error);
-    }
-  }, [success, error, dispatch]);
+  useEffect(() => {
+    return () => {
+      reset();
+    };
+  }, [reset]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -58,7 +58,7 @@ export default function CreateUserPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(createUser(form));
+    mutate(form);
   };
 
   return (
@@ -66,7 +66,7 @@ export default function CreateUserPage() {
       {/* Breadcrumb */}
       <div className="flex items-center flex-wrap flex-row text-sm text-gray-600 overflow-x-auto">
         <a
-          href="/superadmin"
+          href="/"
           className="text-gray-500 hover:text-blue-800 hover:underline whitespace-nowrap"
         >
           Dashboard
@@ -101,44 +101,44 @@ export default function CreateUserPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-600">
-            First Name
+                First Name
               </label>
               <input
-            name="firstname"
-            value={form.firstname}
-            onChange={handleChange}
-            type="text"
-            required
-            className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="John"
+                name="firstname"
+                value={form.firstname}
+                onChange={handleChange}
+                type="text"
+                required
+                className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="John"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-            Middle Name
+                Middle Name
               </label>
               <input
-            type="text"
-            name="middlename"
-            value={form.middlename}
-            onChange={handleChange}
-            required
-            className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="M."
+                type="text"
+                name="middlename"
+                value={form.middlename}
+                onChange={handleChange}
+                required
+                className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="M."
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-            Last Name
+                Last Name
               </label>
               <input
-            type="text"
-            name="lastname"
-            value={form.lastname}
-            onChange={handleChange}
-            required
-            className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Doe"
+                type="text"
+                name="lastname"
+                value={form.lastname}
+                onChange={handleChange}
+                required
+                className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Doe"
               />
             </div>
           </div>
@@ -147,29 +147,29 @@ export default function CreateUserPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-600">
-            Username
+                Username
               </label>
               <input
-            type="text"
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            required
-            className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="johndoe"
+                type="text"
+                name="username"
+                value={form.username}
+                onChange={handleChange}
+                required
+                className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="johndoe"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-            Email
+                Email
               </label>
               <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="john@example.com"
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="john@example.com"
               />
             </div>
           </div>
@@ -178,35 +178,36 @@ export default function CreateUserPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-600">
-            Role
+                Role
               </label>
               <select
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            required
-            className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                required
+                className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
-            <option value="">Select Role</option>
-            <option value="superadmin">Super Admin</option>
-            <option value="principal">Principal</option>
-            <option value="registrar">Registrar</option>
-            <option value="teacher">Teacher</option>
+                <option value="">Select Role</option>
+                <option value="superadmin">Super Admin</option>
+                <option value="author">Author</option>
+                <option value="principal">Principal</option>
+                <option value="registrar">Registrar</option>
+                <option value="teacher">Teacher</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-            Status
+                Status
               </label>
               <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            required
-            className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                required
+                className="block w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
               </select>
             </div>
           </div>
@@ -233,7 +234,7 @@ export default function CreateUserPage() {
               type="submit"
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors hover:cursor-pointer"
             >
-              {loading ? "Creating..." : "Create User"}
+              {isPending ? "Creating..." : "Create User"}
             </button>
           </div>
         </form>

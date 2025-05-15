@@ -178,7 +178,7 @@ export default function EnrolledStudentPage() {
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-600">
         <a
-          href="/administrative"
+          href="/"
           className="text-gray-500 hover:text-blue-800 hover:underline"
         >
           Dashboard
@@ -188,7 +188,7 @@ export default function EnrolledStudentPage() {
           href="/administrative/enrolled-students"
           className="text-blue-600 hover:text-blue-800 hover:underline"
         >
-          Enrolled Student Management
+          Enroll Student Management
         </a>
       </div>
 

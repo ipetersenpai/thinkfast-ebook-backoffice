@@ -246,10 +246,13 @@ export default function StudentScoresPage() {
                       {student.year_level}
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <button className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                      <a
+                        href="/administrative/scores/student-score"
+                        className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition w-30"
+                      >
                         <FiEye size={16} />
                         View Score
-                      </button>
+                      </a>
                     </td>
                   </tr>
                 ))

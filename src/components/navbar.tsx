@@ -4,23 +4,22 @@ import { useState, useEffect, useRef } from "react";
 import { FiMenu, FiUser, FiLogOut } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store";
-import { fetchUserDetails } from "@/redux/slice/user/userSlice";
-import { logout } from "../redux/slice/auth/authSlice";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUserDetails } from "@/api/user";
 
 export function Navbar({ onSidebarToggle }: { onSidebarToggle: () => void }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
 
-  const { firstname, lastname, loading } = useSelector((state: RootState) => state.user);
-  const fullName = `${firstname ?? ""} ${lastname ?? ""}`.trim();
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["userDetails"],
+    queryFn: () => fetchUserDetails(),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    dispatch(fetchUserDetails({ id: undefined }));
-  }, [dispatch]);
+  const fullName = user ? `${user.firstname ?? ""} ${user.lastname ?? ""}`.trim() : "";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -34,7 +33,6 @@ export function Navbar({ onSidebarToggle }: { onSidebarToggle: () => void }) {
 
   const handleLogout = () => {
     Cookies.remove("xyz_token", { path: "/" });
-    dispatch(logout());
     router.push("/");
   };
 
@@ -56,7 +54,7 @@ export function Navbar({ onSidebarToggle }: { onSidebarToggle: () => void }) {
       <div className="relative">
         <div className="flex flex-row items-center">
           <span className="hidden md:block text-black mr-2">
-            {loading ? "" : fullName || ""}
+            {isLoading ? "" : fullName}
           </span>
           <button
             onClick={() => setOpen(!open)}

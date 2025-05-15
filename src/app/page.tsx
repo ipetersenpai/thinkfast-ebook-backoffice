@@ -1,13 +1,10 @@
+// src/app/page.tsx
 "use client";
-
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FiEye, FiEyeOff, FiLock, FiUser, FiLoader } from "react-icons/fi";
-import { useDispatch } from "react-redux";
-import Cookies from "js-cookie";
-import { login } from "../redux/slice/auth/authSlice";
-import { API_URL } from "@/config";
+import { useLogin } from "@/api/auth"; // Import the useLogin hook
 
 export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,35 +13,30 @@ export default function Home() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const dispatch = useDispatch();
   const router = useRouter();
+
+  // Get the login mutation from useLogin
+  const { mutate: login, isPending: loginLoading, isError, error: loginError } = useLogin();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true); // start loading
+    setIsLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Login failed");
-      }
-
-      Cookies.set("xyz_token", data.token, {
-        expires: 1,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "development",
-        path: "/",
+      // Call login and wait for the response data
+      const data = await new Promise<any>((resolve, reject) => {
+        login(
+          { username, password },
+          {
+            onSuccess: (data) => resolve(data),
+            onError: (err) => reject(err),
+          }
+        );
       });
 
-      dispatch(login(JSON.stringify(data.user)));
-
+      // Navigate based on the user's role
       const role = data.user.role.toLowerCase();
       if (role === "registrar" || role === "principal") {
         router.push("/administrative");
@@ -52,15 +44,18 @@ export default function Home() {
         router.push("/faculty");
       } else if (role === "admin" || role === "superadmin") {
         router.push("/superadmin");
+      } else if (role === "author") {
+        router.push("/author");
       } else {
         setError("Unknown role");
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Login failed");
     } finally {
-      setIsLoading(false); // stop loading
+      setIsLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -91,14 +86,14 @@ export default function Home() {
 
           <div className="bg-white p-8 shadow rounded-lg border border-gray-100">
             <form className="space-y-6" onSubmit={handleSubmit}>
-                {error && (
+              {error && (
                 <div
                   className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-sm text-center"
                   role="alert"
                 >
                   {error}
                 </div>
-                )}
+              )}
               <div>
                 <label
                   htmlFor="username"
@@ -171,7 +166,7 @@ export default function Home() {
                   type="submit"
                   className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                 >
-                  {isLoading ? (
+                  {isLoading || loginLoading ? (
                     <>
                       <FiLoader className="animate-spin h-5 w-5 mr-2" />
                       Signing in…

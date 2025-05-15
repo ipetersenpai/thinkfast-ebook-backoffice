@@ -10,23 +10,9 @@ import {
   FiChevronLeft,
   FiChevronRight as FiChevronRightIcon,
 } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import { fetchUsers } from "@/redux/slice/user/getUsersSlice";
 import { useRouter } from "next/navigation";
-
-interface User {
-  id: number;
-  firstname: string;
-  lastname: string;
-  middlename?: string;
-  username: string;
-  email: string;
-  role: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-}
+import { useQuery } from "@tanstack/react-query";
+import { fetchUsers, User } from "@/api/user";
 
 interface SortConfig {
   key: keyof User | null;
@@ -34,17 +20,17 @@ interface SortConfig {
 }
 
 export default function UserManagementPage() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { users, loading, error } = useSelector(
-    (state: RootState) => state.getUsers
-  );
-
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+  const {
+    data: users = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: fetchUsers,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
@@ -52,20 +38,11 @@ export default function UserManagementPage() {
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
-
-  // Inside your component:
   const router = useRouter();
 
   useEffect(() => {
     const filtered = users.filter(
-      (user: {
-        firstname: string;
-        lastname: string;
-        username: string;
-        email: string;
-        role: string;
-        status: string;
-      }) =>
+      (user) =>
         user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -85,12 +62,8 @@ export default function UserManagementPage() {
     setSortConfig({ key, direction });
 
     const sorted = [...filteredUsers].sort((a, b) => {
-      if (a[key]! < b[key]!) {
-        return direction === "asc" ? -1 : 1;
-      }
-      if (a[key]! > b[key]!) {
-        return direction === "asc" ? 1 : -1;
-      }
+      if (a[key]! < b[key]!) return direction === "asc" ? -1 : 1;
+      if (a[key]! > b[key]!) return direction === "asc" ? 1 : -1;
       return 0;
     });
     setFilteredUsers(sorted);
@@ -115,7 +88,6 @@ export default function UserManagementPage() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-600">
         <a
           href="/superadmin"
@@ -132,7 +104,6 @@ export default function UserManagementPage() {
         </a>
       </div>
 
-      {/* Search & Controls */}
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div className="relative w-full md:w-1/3">
@@ -209,7 +180,25 @@ export default function UserManagementPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentItems.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td
+                    colSpan={12}
+                    className="text-center py-4 text-sm text-gray-500"
+                  >
+                    Loading users...
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td
+                    colSpan={12}
+                    className="text-center py-4 text-sm text-red-500"
+                  >
+                    Failed to load users
+                  </td>
+                </tr>
+              ) : currentItems.length > 0 ? (
                 currentItems.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-500">
@@ -227,7 +216,6 @@ export default function UserManagementPage() {
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {user.username}
                     </td>
-
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {user.email}
                     </td>
@@ -236,7 +224,7 @@ export default function UserManagementPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-center">
                       <span
-                        className={`px-2 inline-flex text-xsleading-5 font-semibold rounded-full ${
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           user.status === "active"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
@@ -281,11 +269,12 @@ export default function UserManagementPage() {
         </div>
 
         {/* Pagination */}
-        {users.length > 0 && (
+        {filteredUsers.length > 0 && (
           <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-gray-500">
               Showing {indexOfFirstItem + 1} to{" "}
-              {Math.min(indexOfLastItem, users.length)} of {users.length} users
+              {Math.min(indexOfLastItem, filteredUsers.length)} of{" "}
+              {filteredUsers.length} users
             </div>
             <div className="flex space-x-2">
               <button
@@ -299,6 +288,21 @@ export default function UserManagementPage() {
               >
                 <FiChevronLeft size={18} />
               </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (number) => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`px-3 py-1 rounded-lg border ${
+                      currentPage === number
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "text-gray-700 border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {number}
+                  </button>
+                )
+              )}
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages}
@@ -308,7 +312,7 @@ export default function UserManagementPage() {
                     : "text-gray-700 border-gray-300 hover:bg-gray-50"
                 }`}
               >
-                <FiChevronRightIcon size={18} />
+                <FiChevronRight size={18} />
               </button>
             </div>
           </div>
