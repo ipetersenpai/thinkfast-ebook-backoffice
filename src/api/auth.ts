@@ -19,7 +19,6 @@ type LoginResponse = {
   };
 };
 
-// Function to call the login API
 const loginUser = async ({ username, password }: LoginInput): Promise<LoginResponse> => {
   const res = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
@@ -29,12 +28,16 @@ const loginUser = async ({ username, password }: LoginInput): Promise<LoginRespo
     body: JSON.stringify({ username, password }),
   });
 
+  const data = await res.json();
+
   if (!res.ok) {
-    throw new Error("Login failed");
+    // Throw with the actual error message from backend
+    throw new Error(data.error || "Login failed");
   }
 
-  return res.json(); // Return the data from the API
+  return data; // This will be of type LoginResponse
 };
+
 
 // The custom hook to use the login mutation
 export const useLogin = () => {

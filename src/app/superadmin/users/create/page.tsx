@@ -189,7 +189,6 @@ export default function CreateUserPage() {
               >
                 <option value="">Select Role</option>
                 <option value="superadmin">Super Admin</option>
-                <option value="author">Author</option>
                 <option value="principal">Principal</option>
                 <option value="registrar">Registrar</option>
                 <option value="teacher">Teacher</option>

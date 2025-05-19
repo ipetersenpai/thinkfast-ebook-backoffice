@@ -1,3 +1,4 @@
+// src/api/user.ts
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getTokenFromCookies, getUserIdFromToken } from "@/lib/auth";
@@ -15,6 +16,8 @@ export interface UserData {
 
 export interface User {
   id: number;
+  student_id: number;
+  year_level: number;
   firstname: string;
   lastname: string;
   middlename: string;

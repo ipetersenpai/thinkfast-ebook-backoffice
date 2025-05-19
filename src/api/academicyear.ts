@@ -2,7 +2,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { API_URL } from "@/config";
-import { getTokenFromCookies } from "@/lib/auth"; // ✅ import here
+import { getTokenFromCookies } from "@/lib/auth";
 
 export interface AcademicYearData {
   term: string;
@@ -23,9 +23,9 @@ export interface AcademicYear {
   updated_at: string;
 }
 
-// 🔁 POST: Create academic year
+// 🔁 API call function
 const createAcademicYearAPI = async (data: AcademicYearData) => {
-  const token = getTokenFromCookies(); // ✅ use custom function
+  const token = getTokenFromCookies();
   if (!token) throw new Error("No authentication token found");
 
   try {
@@ -41,16 +41,15 @@ const createAcademicYearAPI = async (data: AcademicYearData) => {
   }
 };
 
-// ✅ React Query hook for creating
+// ✅ React Query mutation hook
 export const useCreateAcademicYear = () => {
   return useMutation({
     mutationFn: createAcademicYearAPI,
   });
 };
 
-// 🔁 GET: Fetch academic years
 const fetchAcademicYears = async (): Promise<AcademicYear[]> => {
-  const token = getTokenFromCookies(); // ✅ use custom function
+  const token = getTokenFromCookies();
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(`${API_URL}/api/academic_year/`, {
@@ -58,15 +57,12 @@ const fetchAcademicYears = async (): Promise<AcademicYear[]> => {
       Authorization: `Bearer ${token}`,
     },
   });
-
   if (!response.ok) {
     throw new Error("Failed to fetch academic years");
   }
-
   return response.json();
 };
 
-// ✅ React Query hook for fetching
 export const useAcademicYears = () => {
   return useQuery({
     queryKey: ["academicYears"],

@@ -13,7 +13,7 @@ import {
 
 interface Course {
   id: number;
-  description: string;
+  block_name: string; // Renamed from description to block_name
   created_at: string;
   updated_at: string;
 }
@@ -27,43 +27,43 @@ export default function StudentScoresPage() {
   const mockCourses: Course[] = [
     {
       id: 101,
-      description: "Grade 6 - Subjects",
+      block_name: "Grade 6 - Subjects", // Updated key
       created_at: "2024-01-10",
       updated_at: "2024-05-01",
     },
     {
       id: 102,
-      description: "Grade 4 - Subjects",
+      block_name: "Grade 4 - Subjects", // Updated key
       created_at: "2024-02-12",
       updated_at: "2024-04-28",
     },
     {
       id: 103,
-      description: "Grade 5 - Subjects",
+      block_name: "Grade 5 - Subjects", // Updated key
       created_at: "2024-03-15",
       updated_at: "2024-05-10",
     },
     {
       id: 104,
-      description: "Grade 7 - Subjects",
+      block_name: "Grade 7 - Subjects", // Updated key
       created_at: "2024-01-20",
       updated_at: "2024-05-05",
     },
     {
       id: 105,
-      description: "Grade 8 - Subjects",
+      block_name: "Grade 8 - Subjects", // Updated key
       created_at: "2024-02-18",
       updated_at: "2024-05-12",
     },
     {
       id: 106,
-      description: "Grade 9 - Subjects",
+      block_name: "Grade 9 - Subjects", // Updated key
       created_at: "2024-03-22",
       updated_at: "2024-05-15",
     },
     {
       id: 107,
-      description: "Grade 10 - Subjects",
+      block_name: "Grade 10 - Subjects", // Updated key
       created_at: "2024-04-01",
       updated_at: "2024-05-20",
     },
@@ -76,11 +76,11 @@ export default function StudentScoresPage() {
     direction: "asc",
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   useEffect(() => {
     const filtered = mockCourses.filter((course) =>
-      course.description.toLowerCase().includes(searchTerm.toLowerCase())
+      course.block_name.toLowerCase().includes(searchTerm.toLowerCase()) // Updated key
     );
     setCourses(filtered);
     setCurrentPage(1);
@@ -111,7 +111,7 @@ export default function StudentScoresPage() {
 
   const headers: { key: keyof Course; label: string }[] = [
     { key: "id", label: "ID" },
-    { key: "description", label: "Description" },
+    { key: "block_name", label: "Block Name" }, // Updated label and key
     { key: "created_at", label: "Created At" },
     { key: "updated_at", label: "Updated At" },
   ];
@@ -203,7 +203,7 @@ export default function StudentScoresPage() {
                     {course.id}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {course.description}
+                    {course.block_name} {/* Updated key */}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {formatDate(course.created_at)}

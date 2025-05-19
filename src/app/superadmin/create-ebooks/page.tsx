@@ -68,23 +68,25 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div>
+            <div>
             <label className="block text-sm font-medium text-gray-700">
-              Content (HTML)
+              Content (HTML File)
             </label>
-            <textarea
-              rows={8}
-              placeholder="Write or paste HTML content here..."
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ></textarea>
-          </div>
+            <input
+              type="file"
+              accept=".html"
+              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            </div>
 
-          <button
-            type="submit"
-            className="inline-flex items-center px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Save E-Book
-          </button>
+            <div className="flex justify-end">
+            <button
+              type="submit"
+              className="inline-flex items-center px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Save E-Book
+            </button>
+            </div>
         </form>
       </div>
     </div>

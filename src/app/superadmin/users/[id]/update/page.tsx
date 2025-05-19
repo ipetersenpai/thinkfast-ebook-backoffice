@@ -1,45 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { FiChevronRight } from "react-icons/fi";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTokenFromCookies } from "@/lib/auth";
-import { fetchUserDetails } from "@/api/user";
-import axios from "axios";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  fetchUserDetails,
+  useUpdateUser,
+  UserData,
+  UpdateUser,
+} from "@/api/user";
+import { useQuery } from "@tanstack/react-query";
 import "react-toastify/dist/ReactToastify.css";
 
-interface User {
-  id: string | number;
-  firstname: string;
-  middlename?: string;
-  lastname: string;
-  username: string;
-  email: string;
-  role: string;
-  status: string;
-}
-
-interface UpdateUser extends User {
-  password?: string;
-}
-
-async function updateUser(userData: UpdateUser) {
-  const token = getTokenFromCookies();
-  const { data } = await axios.put(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users/update/${userData.id}`,
-    userData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return data;
-}
-
 export default function UpdateUserPage() {
+  const router = useRouter();
   const params = useParams();
   const userId = params?.id as string;
   const queryClient = useQueryClient();
@@ -49,7 +25,7 @@ export default function UpdateUserPage() {
     isLoading: userLoading,
     error: userError,
   } = useQuery({
-    queryKey: ["userDetails", userId],
+    queryKey: ["user", userId],
     queryFn: () => fetchUserDetails(userId),
     enabled: !!userId,
     retry: false,
@@ -83,21 +59,7 @@ export default function UpdateUserPage() {
     }
   }, [userDetails, userId]);
 
-
-  const mutation = useMutation({
-    mutationFn: updateUser,
-    onSuccess: () => {
-      toast.success("User updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["userDetails", userId] });
-      setForm((f) => ({ ...f, password: "" }));
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to update user");
-    },
-  });
-
-  const { isPending } = mutation;
-
+  const mutation = useUpdateUser();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -106,9 +68,18 @@ export default function UpdateUserPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate(form);
+    mutation.mutate(form, {
+      onSuccess: () => {
+        toast.success("User updated successfully!");
+        queryClient.invalidateQueries({ queryKey: ["user", userId] });
+        router.push("/superadmin/users");
+      },
+      onError: (error: any) => {
+        toast.error(error?.response?.data?.message || "Failed to update user");
+      },
+    });
   };
 
   if (!userId) return <p>Invalid user ID.</p>;
@@ -285,7 +256,7 @@ export default function UpdateUserPage() {
               type="submit"
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors hover:cursor-pointer"
             >
-              {isPending ? "Updating..." : "Update Information"}
+                  {mutation.isPending ? "Updating..." : "Update Information"}
             </button>
           </div>
           </form>

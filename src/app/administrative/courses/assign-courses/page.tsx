@@ -5,76 +5,81 @@ import {
   FiSearch,
   FiChevronUp,
   FiChevronDown,
-  FiEdit2,
-  FiTrash2,
   FiChevronLeft,
   FiChevronRight as FiChevronRightIcon,
 } from "react-icons/fi";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { fetchUsers, User } from "@/api/user";
+import { IoMdAdd } from "react-icons/io";
+import { useAcademicYears, AcademicYear } from "@/api/academicyear";
+
+
+interface EnrolledStudent {
+  student_id: number;
+  account_code: string;
+  fullname: string;
+  year_level: string; // e.g., "Grade 1" to "Grade 10"
+  date_enrolled: string;
+}
 
 interface SortConfig {
-  key: keyof User | null;
+  key: keyof EnrolledStudent | null;
   direction: "asc" | "desc";
 }
 
-export default function UserManagementPage() {
-  const {
-    data: users = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
-    staleTime: 5 * 60 * 1000,
-  });
+export default function EnrolledStudentPage() {
+  const mockStudents: EnrolledStudent[] = [
+    {
+      student_id: 1,
+      account_code: "STDXYZ01",
+      fullname: "John Doe",
+      year_level: "Grade 1",
+      date_enrolled: "2024-02-15",
+    },
+  ];
 
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const { data: academicYear = []} = useAcademicYears();
+  const [students, setStudents] = useState<EnrolledStudent[]>(mockStudents);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
     direction: "asc",
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 50;
-  const router = useRouter();
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    const filtered = users.filter(
-      (user) =>
-        user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.status.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = mockStudents.filter(
+      (student) =>
+        student.account_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.year_level.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFilteredUsers(filtered);
+    setStudents(filtered);
     setCurrentPage(1);
-  }, [searchTerm, users]);
+  }, [searchTerm]);
 
-  const requestSort = (key: keyof User) => {
+  const requestSort = (key: keyof EnrolledStudent) => {
     let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
     setSortConfig({ key, direction });
 
-    const sorted = [...filteredUsers].sort((a, b) => {
+    const sorted = [...students].sort((a, b) => {
       if (a[key]! < b[key]!) return direction === "asc" ? -1 : 1;
       if (a[key]! > b[key]!) return direction === "asc" ? 1 : -1;
       return 0;
     });
-    setFilteredUsers(sorted);
+
+    setStudents(sorted);
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const currentItems = students.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(students.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState("2024-2025");
 
   const formatDate = (dateString: string): string => {
     if (typeof window === "undefined") return dateString;
@@ -88,79 +93,90 @@ export default function UserManagementPage() {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-600">
         <a
-          href="/superadmin"
+          href="/"
           className="text-gray-500 hover:text-blue-800 hover:underline"
         >
           Dashboard
         </a>
         <FiChevronRight className="mx-2 text-gray-400" size={14} />
         <a
-          href="/superadmin/users"
+          href="/administrative/enrolled-students"
           className="text-blue-600 hover:text-blue-800 hover:underline"
         >
-          User Management
+          Assign Courses
         </a>
       </div>
 
+      {/* Search & Controls */}
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div className="relative w-full md:w-1/3">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder="Search students..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <a
-            href="/superadmin/users/create"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors hover:cursor-pointer text-center"
-          >
-            Add New User
-          </a>
+
+          <div className="relative w-full md:w-1/4 md:ml-auto">
+            <div className="relative">
+            <select
+                id="academicYear"
+                name="academicYear"
+                value={selectedAcademicYear}
+                onChange={(e) => setSelectedAcademicYear(e.target.value)}
+                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg appearance-none bg-white"
+              >
+                <option value="">Select Academic Year</option>
+                {academicYear.map((year: AcademicYear) => (
+                  <option key={year.term} value={year.term}>
+                    {year.description}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg
+                  className="h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto relative">
+        <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 {[
-                  "id",
-                  "firstname",
-                  "lastname",
-                  "middlename",
-                  "username",
-                  "email",
-                  "role",
-                  "status",
-                  "created_at",
-                  "updated_at",
+                  "student_id",
+                  "account_code",
+                  "fullname",
+                  "year_level",
+                  "date_enrolled",
                 ].map((key) => (
                   <th
                     key={key}
-                    onClick={() => requestSort(key as keyof User)}
-                    className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer ${
-                      key === "role" || key === "status"
-                        ? "text-center"
-                        : "text-left"
-                    } ${
-                      key === "created_at" || key === "updated_at"
-                        ? "min-w-[170px]"
-                        : ""
-                    } ${key === "status" ? "min-w-[150px]" : ""}`}
+                    onClick={() => requestSort(key as keyof EnrolledStudent)}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   >
-                    <div
-                      className={`flex items-center ${
-                        key === "role" || key === "status"
-                          ? "justify-center"
-                          : ""
-                      }`}
-                    >
+                    <div className="flex items-center">
                       {key.replace("_", " ").toUpperCase()}
                       {sortConfig.key === key && (
                         <span className="ml-1">
@@ -174,82 +190,34 @@ export default function UserManagementPage() {
                     </div>
                   </th>
                 ))}
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td
-                    colSpan={12}
-                    className="text-center py-4 text-sm text-gray-500"
-                  >
-                    Loading users...
-                  </td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td
-                    colSpan={12}
-                    className="text-center py-4 text-sm text-red-500"
-                  >
-                    Failed to load users
-                  </td>
-                </tr>
-              ) : currentItems.length > 0 ? (
-                currentItems.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+              {currentItems.length > 0 ? (
+                currentItems.map((student) => (
+                  <tr key={student.student_id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {user.id}
+                      {student.student_id}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {user.firstname}
+                      {student.account_code}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {user.lastname}
+                      {student.fullname}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {user.middlename || "-"}
+                      {student.year_level}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {user.username}
+                      {formatDate(student.date_enrolled)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {user.email}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 text-center">
-                      {user.role}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-center">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          user.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {formatDate(user.created_at)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {formatDate(user.updated_at)}
-                    </td>
-                    <td className="px-6 py-4 text-right text-sm font-medium">
-                      <button
-                        onClick={() =>
-                          router.push(`/superadmin/users/${user.id}/update`)
-                        }
-                        className="text-blue-600 hover:text-blue-900 mr-4"
-                      >
-                        <FiEdit2 size={18} />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <FiTrash2 size={18} />
+                    <td className="px-6 py-4 text-center text-sm align-middle">
+                      <button className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition w-37 mx-auto">
+                        <IoMdAdd size={16} />
+                        Assign Courses
                       </button>
                     </td>
                   </tr>
@@ -257,10 +225,10 @@ export default function UserManagementPage() {
               ) : (
                 <tr>
                   <td
-                    colSpan={12}
+                    colSpan={6}
                     className="px-6 py-4 text-center text-sm text-gray-500"
                   >
-                    No users found
+                    No students found
                   </td>
                 </tr>
               )}
@@ -269,12 +237,12 @@ export default function UserManagementPage() {
         </div>
 
         {/* Pagination */}
-        {filteredUsers.length > 0 && (
+        {students.length > 0 && (
           <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-gray-500">
               Showing {indexOfFirstItem + 1} to{" "}
-              {Math.min(indexOfLastItem, filteredUsers.length)} of{" "}
-              {filteredUsers.length} users
+              {Math.min(indexOfLastItem, students.length)} of {students.length}{" "}
+              students
             </div>
             <div className="flex space-x-2">
               <button
@@ -312,7 +280,7 @@ export default function UserManagementPage() {
                     : "text-gray-700 border-gray-300 hover:bg-gray-50"
                 }`}
               >
-                <FiChevronRight size={18} />
+                <FiChevronRightIcon size={18} />
               </button>
             </div>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FiChevronRight, FiSearch } from "react-icons/fi";
+import { FiChevronRight, FiEdit2, FiTrash2, FiSearch } from "react-icons/fi";
 
 interface Ebooks {
   id: number;
@@ -125,14 +125,36 @@ export default function DashboardPage() {
             filteredEbooks.map((ebook) => (
               <div
                 key={ebook.id}
-                className="bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 hover:border-blue-300 overflow-hidden cursor-pointer"
+                className="relative bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 hover:border-blue-300 overflow-hidden cursor-pointer"
               >
                 <img
                   src={ebook.coverImage}
                   alt={ebook.title}
                   className="w-full h-48 object-cover"
                 />
-                <div className="p-4">
+                <div className="p-4 relative">
+                  {/* Icons container moved inside the padded div */}
+                  <div className="absolute top-2 right-2 flex space-x-2 z-10">
+                    <FiEdit2
+                      className=" text-blue-500 hover:text-blue-700 cursor-pointer"
+                      size={20}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log("Edit", ebook.id);
+                      }}
+                      title="Edit"
+                    />
+                    <FiTrash2
+                      className=" text-red-500 hover:text-red-700 cursor-pointer"
+                      size={20}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log("Delete", ebook.id);
+                      }}
+                      title="Delete"
+                    />
+                  </div>
+
                   <h3 className="text-lg font-semibold text-gray-800">
                     {ebook.title}
                   </h3>

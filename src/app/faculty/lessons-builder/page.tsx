@@ -1,18 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   FiChevronRight,
   FiSearch,
   FiChevronUp,
   FiChevronDown,
   FiEdit2,
-  FiTrash2,
   FiChevronLeft,
   FiChevronRight as FiChevronRightIcon,
 } from "react-icons/fi";
-import { useAcademicYears, AcademicYear } from "@/api/academicyear";
-import { useCoursesByTerm, Course } from "@/api/course";
+import Link from "next/link";
+
+interface Course {
+  id: number;
+  title: string;
+  description: string;
+  instructor: string;
+  created_at: string;
+  updated_at: string;
+}
 
 interface SortConfig {
   key: keyof Course | null;
@@ -20,56 +26,83 @@ interface SortConfig {
 }
 
 export default function DashboardPage() {
-  const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
+  // Mock data for courses
+  const mockCourses: Course[] = [
+    {
+      id: 1,
+      title: "Introduction to Computer Science",
+      description: "Fundamentals of programming and algorithms",
+      instructor: "Dr. Alice Johnson",
+      created_at: "2023-01-15",
+      updated_at: "2023-06-20",
+    },
+    {
+      id: 2,
+      title: "Advanced Mathematics",
+      description: "Calculus and linear algebra for engineers",
+      instructor: "Prof. Bob Smith",
+      created_at: "2023-02-10",
+      updated_at: "2023-05-15",
+    },
+    {
+      id: 3,
+      title: "Data Structures",
+      description:
+        "Learn about common data structures and their implementations",
+      instructor: "Dr. Carol Lee",
+      created_at: "2023-03-05",
+      updated_at: "2023-07-10",
+    },
+    {
+      id: 4,
+      title: "Web Development",
+      description: "Building modern web applications",
+      instructor: "Prof. David Brown",
+      created_at: "2023-04-20",
+      updated_at: "2023-08-25",
+    },
+  ];
+
+  const [courses, setCourses] = useState<Course[]>(mockCourses);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
     direction: "asc",
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 50;
-  const router = useRouter();
+  const itemsPerPage = 10;
 
-  const { data: academicYear = [] } = useAcademicYears();
-
-  // Set active academic year on load
+  // Search functionality
   useEffect(() => {
-    if (academicYear.length > 0 && !selectedAcademicYear) {
-      const activeYear = academicYear.find((year: AcademicYear) => year.status === "active");
-      if (activeYear) {
-        setSelectedAcademicYear(activeYear.term);
-      }
-    }
-  }, [academicYear, selectedAcademicYear]);
-
-  const { data: fetchedCourses = [] } = useCoursesByTerm(selectedAcademicYear);
-
-  // Filtered + sorted courses state
-  const [courses, setCourses] = useState<Course[]>([]);
-
-  // Filter and sort logic
-  useEffect(() => {
-    let filtered = [...fetchedCourses];
-
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (course) =>
-          course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          course.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (sortConfig.key) {
-      filtered.sort((a, b) => {
-        if (a[sortConfig.key!] < b[sortConfig.key!]) return sortConfig.direction === "asc" ? -1 : 1;
-        if (a[sortConfig.key!] > b[sortConfig.key!]) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-    }
-
+    const filtered = mockCourses.filter(
+      (course) =>
+        course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     setCourses(filtered);
-    setCurrentPage(1);
-  }, [fetchedCourses, searchTerm, sortConfig]);
+    setCurrentPage(1); // Reset to first page when searching
+  }, [searchTerm]);
+
+  // Sort functionality
+  const requestSort = (key: keyof Course) => {
+    let direction: "asc" | "desc" = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+
+    const sortedCourses = [...courses].sort((a, b) => {
+      if (a[key] < b[key]) {
+        return direction === "asc" ? -1 : 1;
+      }
+      if (a[key] > b[key]) {
+        return direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+
+    setCourses(sortedCourses);
+  };
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -79,16 +112,13 @@ export default function DashboardPage() {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const requestSort = (key: keyof Course) => {
-    let direction: "asc" | "desc" = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
 
   const formatDate = (dateString: string): string => {
-    if (typeof window === "undefined") return dateString;
+    if (typeof window === "undefined") {
+      // On the server, just return the raw YYYY-MM-DD string (matches DB)
+      return dateString;
+    }
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
       month: "short",
@@ -102,17 +132,17 @@ export default function DashboardPage() {
       {/* Breadcrumb Navigation */}
       <div className="flex items-center text-sm text-gray-600">
         <a
-          href="/administrative"
+          href="/"
           className="text-gray-500 hover:text-blue-800 hover:underline"
         >
           Dashboard
         </a>
         <FiChevronRight className="mx-2 text-gray-400" size={14} />
         <a
-          href="/administrative/courses"
+          href="/faculty/lessons-builder"
           className="text-blue-600 hover:text-blue-800 hover:underline"
         >
-          Courses
+          Lessons Builder
         </a>
       </div>
 
@@ -130,16 +160,9 @@ export default function DashboardPage() {
             />
           </div>
 
-          <a
-            href="/administrative/courses/create"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors hover:cursor-pointer text-center"
-          >
-            Add New Course
-          </a>
-
           <div className="relative w-full md:w-1/4 md:ml-auto">
             <div className="relative">
-            <select
+              <select
                 id="academicYear"
                 name="academicYear"
                 value={selectedAcademicYear}
@@ -147,11 +170,9 @@ export default function DashboardPage() {
                 className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg appearance-none bg-white"
               >
                 <option value="">Select Academic Year</option>
-                {academicYear.map((year: AcademicYear) => (
-                  <option key={year.term} value={year.term}>
-                    {year.description}
-                  </option>
-                ))}
+                <option value="2024-2025">Academic Year 2024-2025</option>
+                <option value="2023-2024">Academic Year 2023-2024</option>
+                <option value="2022-2023">Academic Year 2022-2023</option>
               </select>
 
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -225,47 +246,11 @@ export default function DashboardPage() {
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[300px]"
                 >
-                  Instructor Name
+                  Instructor {/* New header for instructor */}
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("created_at")}
-                >
-                  <div className="flex items-center">
-                    Created
-                    {sortConfig.key === "created_at" && (
-                      <span className="ml-1">
-                        {sortConfig.direction === "asc" ? (
-                          <FiChevronUp size={16} />
-                        ) : (
-                          <FiChevronDown size={16} />
-                        )}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("updated_at")}
-                >
-                  <div className="flex items-center">
-                    Updated
-                    {sortConfig.key === "updated_at" && (
-                      <span className="ml-1">
-                        {sortConfig.direction === "asc" ? (
-                          <FiChevronUp size={16} />
-                        ) : (
-                          <FiChevronDown size={16} />
-                        )}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Actions
                 </th>
@@ -292,27 +277,22 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-500">
-                        {course.faculty_full_name} {/* New faculty_full_name field */}
+                        {course.instructor} {/* New instructor field */}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(course.created_at)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(course.updated_at)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                        onClick={() =>
-                          router.push(`/administrative/courses/${course.id}/update`)
-                        }
-                        className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
-                      >
-                        <FiEdit2 size={18} />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <FiTrash2 size={18} />
-                      </button>
+                    <td className="px-6 py-4 flex items-center gap-2 justify-center">
+                      <Link href={`lessons-builder/${course.id}/update`}>
+                        <button className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition w-18 cursor-pointer">
+                          <FiEdit2 size={16} />
+                          Edit
+                        </button>
+                      </Link>
+                      <Link href={`lessons-builder/${course.id}/create`}>
+                        <button className="flex items-center gap-2 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition w-23 cursor-pointer">
+                          <FiEdit2 size={16} />
+                          Create
+                        </button>
+                      </Link>
                     </td>
                   </tr>
                 ))

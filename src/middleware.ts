@@ -63,8 +63,6 @@ export function middleware(request: NextRequest) {
   if (path === '/') {
     if (userRole === 'teacher') {
       return NextResponse.redirect(new URL('/faculty', request.url))
-    } else if (userRole === 'author') {
-      return NextResponse.redirect(new URL('/author', request.url))
     }
     return NextResponse.redirect(new URL('/administrative', request.url))
   }

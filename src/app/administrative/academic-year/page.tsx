@@ -18,7 +18,7 @@ interface SortConfig {
 }
 
 export default function AcademicYearPage() {
-  const { data: academicYear = [], isLoading, isError } = useAcademicYears();
+  const { data: academicYear = []} = useAcademicYears();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({

@@ -88,8 +88,8 @@ export function Sidebar({
       icon: <HiOutlineDocumentReport className="flex-shrink-0" />,
     },
     {
-      href: "/superadmin/",
-      label: "Lessons Management",
+      href: "/author/lessons-builder",
+      label: "Lessons Builder",
       icon: <FiBookOpen className="flex-shrink-0" />,
     },
 
@@ -159,37 +159,6 @@ export function Sidebar({
     },
   ];
 
-  // author menu items
-  // Userrole is "author"
-  const author_menuItems = [
-    {
-      href: "/faculty",
-      label: "Dashboard",
-      icon: <FiHome className="flex-shrink-0" />,
-    },
-    {
-      href: "/author/lessons",
-      label: "Lessons Management",
-      icon: <FiBookOpen className="flex-shrink-0" />,
-    },
-
-    { section: "Assessment Tool" },
-    {
-      href: "/author/create-assessment",
-      label: "Assessment",
-      icon: <MdOutlineAssessment className="flex-shrink-0" />,
-    },
-    {
-      href: "/author/create-performance-task",
-      label: "Performance Task",
-      icon: <AiOutlineFileSearch className="flex-shrink-0" />,
-    },
-    {
-      href: "/author/create-quarter-exam",
-      label: "Quarter Exam",
-      icon: <AiOutlineFileSearch className="flex-shrink-0" />,
-    },
-  ];
 
   // administrative menu items
   // Userrole is "principal"
@@ -273,6 +242,11 @@ export function Sidebar({
       icon: <FiHome className="flex-shrink-0" />,
     },
     {
+      href: "/faculty/lesson-management",
+      label: "Lessons Management",
+      icon: <FiBookOpen className="flex-shrink-0" />,
+    },
+    {
       href: "/faculty/course-progress",
       label: "Course Progress",
       icon: <FiTrendingUp className="flex-shrink-0" />,
@@ -281,6 +255,28 @@ export function Sidebar({
       href: "/faculty/scores",
       label: "Score History",
       icon: <HiOutlineDocumentReport className="flex-shrink-0" />,
+    },
+
+    {
+      href: "/faculty/lessons-builder",
+      label: "Lessons Builder",
+      icon: <FiBookOpen className="flex-shrink-0" />,
+    },
+    { section: "Assessment Tool" },
+    {
+      href: "/faculty/create-assessment",
+      label: "Assessment",
+      icon: <MdOutlineAssessment className="flex-shrink-0" />,
+    },
+    {
+      href: "/faculty/create-performance-task",
+      label: "Performance Task",
+      icon: <AiOutlineFileSearch className="flex-shrink-0" />,
+    },
+    {
+      href: "/faculty/create-quarter-exam",
+      label: "Quarter Exam",
+      icon: <AiOutlineFileSearch className="flex-shrink-0" />,
     },
   ];
 
