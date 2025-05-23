@@ -38,7 +38,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Score History */}
-        <div className="space-y-10">']'
+        <div className="space-y-10">
           {/* Subject: Math */}
           <div>
             <h3 className="text-lg font-semibold text-gray-700 mb-3">

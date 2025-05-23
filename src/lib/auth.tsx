@@ -74,9 +74,10 @@ export function getTokenFromCookies(): string | null {
  * @param token - JWT token string
  * @returns Object with role and exp, or nulls if invalid
  */
-export function getTokenInfo(token: string): { role: string | null; exp: number | null } {
+export function getTokenInfo(token: string): { id: number | null; role: string | null; exp: number | null } {
   const payload = decodeToken(token);
   return {
+    id: payload?.id ? Number(payload.id) : null,
     role: payload?.role ?? null,
     exp: payload?.exp ?? null,
   };

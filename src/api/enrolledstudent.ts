@@ -13,6 +13,7 @@ export interface Students {
     session_id: number;
     student_id: number;
     student_session_id: number;
+    total_assigned_course: number;
     year_level: string;
     created_at: string;
     updated_at: string;

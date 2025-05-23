@@ -61,8 +61,6 @@ export function Sidebar({
         setMenuItems(registrar_menuItems);
       } else if (role === "teacher") {
         setMenuItems(faculty_menuItems);
-      } else if (role === "author") {
-        setMenuItems(author_menuItems);
       } else {
         setMenuItems([]); // Unknown role or no access
       }
@@ -159,7 +157,6 @@ export function Sidebar({
     },
   ];
 
-
   // administrative menu items
   // Userrole is "principal"
   const principal_menuItems = [
@@ -242,21 +239,11 @@ export function Sidebar({
       icon: <FiHome className="flex-shrink-0" />,
     },
     {
-      href: "/faculty/lesson-management",
-      label: "Lessons Management",
-      icon: <FiBookOpen className="flex-shrink-0" />,
-    },
-    {
-      href: "/faculty/course-progress",
-      label: "Course Progress",
-      icon: <FiTrendingUp className="flex-shrink-0" />,
-    },
-    {
       href: "/faculty/scores",
       label: "Score History",
       icon: <HiOutlineDocumentReport className="flex-shrink-0" />,
     },
-
+    { section: "Lessons Management" },
     {
       href: "/faculty/lessons-builder",
       label: "Lessons Builder",

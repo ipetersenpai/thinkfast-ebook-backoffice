@@ -119,12 +119,51 @@ const getFacultyListAPI = async (): Promise<FacultyList[]> => {
     }
 };
 
+// Get Courses by Term and Faculty ID
+const getCoursesByTermAndFacultyAPI = async (
+    term: string,
+    faculty_id: number
+  ): Promise<Course[]> => {
+    const token = getTokenFromCookies();
+    if (!token) throw new Error("No authentication token found");
+
+    try {
+      const response = await axios.get<Course[]>(
+        `${API_URL}/api/courses/faculty/term=${term}/faculty_id=${faculty_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to fetch courses by term and faculty"
+      );
+    }
+  };
+
 // useMutation for creating a course
 export const useCreateCourse = () => {
     return useMutation({
         mutationFn: createCourseAPI,
     });
 };
+
+// useQuery for fetching courses by term and faculty_id
+export const useCoursesByTermAndFaculty = (
+    term: string,
+    faculty_id: number
+  ) => {
+    return useQuery<Course[]>({
+      queryKey: ["courses", "term", term, "faculty", faculty_id],
+      queryFn: () => getCoursesByTermAndFacultyAPI(term, faculty_id),
+      enabled: !!term && !!faculty_id,
+    });
+  };
+
 
 // useQuery for fetching courses by term
 export const useCoursesByTerm = (term: string) => {

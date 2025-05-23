@@ -97,7 +97,7 @@ export default function UpdateEnrolledStudentPage() {
           href="/administrative/enroll"
           className="hover:text-blue-800 hover:underline"
         >
-          Enrolled Students
+          Enroll Student Management
         </a>
         <FiChevronRight className="mx-2 text-gray-400" size={14} />
         <span className="text-blue-600">Update Student</span>

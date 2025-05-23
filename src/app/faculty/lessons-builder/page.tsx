@@ -10,6 +10,9 @@ import {
   FiChevronRight as FiChevronRightIcon,
 } from "react-icons/fi";
 import Link from "next/link";
+import { useAcademicYears, AcademicYear } from "@/api/academicyear";
+import { useCoursesByTermAndFaculty } from "@/api/course";
+import { getTokenFromCookies, getTokenInfo } from "@/lib/auth";
 
 interface Course {
   id: number;
@@ -19,13 +22,43 @@ interface Course {
   created_at: string;
   updated_at: string;
 }
-
 interface SortConfig {
   key: keyof Course | null;
   direction: "asc" | "desc";
 }
 
 export default function DashboardPage() {
+
+  const [userId, setUserId ] = useState("");
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
+
+  useEffect(() => {
+    const token = getTokenFromCookies();
+
+    if (token) {
+      const { id } = getTokenInfo(token);
+      setUserId(String(id));
+    }
+  }, []);
+
+  const { data: academicYear = [] } = useAcademicYears();
+  useEffect(() => {
+    if (academicYear.length > 0 && !selectedAcademicYear) {
+      const activeYear = academicYear.find(
+        (year: AcademicYear) => year.status === "active"
+      );
+      if (activeYear) {
+        setSelectedAcademicYear(activeYear.term);
+      }
+    }
+  }, [academicYear, selectedAcademicYear]);
+
+  const { data: coursesList, isPending } = useCoursesByTermAndFaculty(
+    selectedAcademicYear,
+    Number(userId)
+  );
+
+
   // Mock data for courses
   const mockCourses: Course[] = [
     {
@@ -36,31 +69,7 @@ export default function DashboardPage() {
       created_at: "2023-01-15",
       updated_at: "2023-06-20",
     },
-    {
-      id: 2,
-      title: "Advanced Mathematics",
-      description: "Calculus and linear algebra for engineers",
-      instructor: "Prof. Bob Smith",
-      created_at: "2023-02-10",
-      updated_at: "2023-05-15",
-    },
-    {
-      id: 3,
-      title: "Data Structures",
-      description:
-        "Learn about common data structures and their implementations",
-      instructor: "Dr. Carol Lee",
-      created_at: "2023-03-05",
-      updated_at: "2023-07-10",
-    },
-    {
-      id: 4,
-      title: "Web Development",
-      description: "Building modern web applications",
-      instructor: "Prof. David Brown",
-      created_at: "2023-04-20",
-      updated_at: "2023-08-25",
-    },
+
   ];
 
   const [courses, setCourses] = useState<Course[]>(mockCourses);
@@ -70,7 +79,7 @@ export default function DashboardPage() {
     direction: "asc",
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   // Search functionality
   useEffect(() => {
@@ -112,7 +121,6 @@ export default function DashboardPage() {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
 
   const formatDate = (dateString: string): string => {
     if (typeof window === "undefined") {
@@ -162,18 +170,20 @@ export default function DashboardPage() {
 
           <div className="relative w-full md:w-1/4 md:ml-auto">
             <div className="relative">
-              <select
-                id="academicYear"
-                name="academicYear"
-                value={selectedAcademicYear}
-                onChange={(e) => setSelectedAcademicYear(e.target.value)}
-                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg appearance-none bg-white"
-              >
-                <option value="">Select Academic Year</option>
-                <option value="2024-2025">Academic Year 2024-2025</option>
-                <option value="2023-2024">Academic Year 2023-2024</option>
-                <option value="2022-2023">Academic Year 2022-2023</option>
-              </select>
+            <select
+              id="academicYear"
+              name="academicYear"
+              value={selectedAcademicYear}
+              onChange={(e) => setSelectedAcademicYear(e.target.value)}
+              className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg appearance-none bg-white"
+            >
+              <option value="">Select Academic Year</option>
+              {academicYear.map((year: AcademicYear) => (
+                <option key={year.term} value={year.term}>
+                  {year.description}
+                </option>
+              ))}
+            </select>
 
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <svg

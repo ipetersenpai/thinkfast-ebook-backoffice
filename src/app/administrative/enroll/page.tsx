@@ -27,6 +27,7 @@ interface EnrolledStudent {
   date_enrolled: string;
 }
 
+
 export default function EnrolledStudentPage() {
   const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
   const [searchTerm, setSearchTerm] = useState<string>("");
